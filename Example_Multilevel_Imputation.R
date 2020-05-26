@@ -1,6 +1,6 @@
 #########################################
 #                                       #
-#   Example for multilevel imputation   #
+#   Example multilevel imputation   #
 #                                       # 
 #########################################
 
