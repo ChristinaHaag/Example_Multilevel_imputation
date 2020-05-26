@@ -1,10 +1,11 @@
-##############################################
-#                                            #
-#   Example for multilevel imputation data   #
-#                                            # 
-##############################################
+#########################################
+#                                       #
+#   Example for multilevel imputation   #
+#                                       # 
+#########################################
 
-# For details and a tutorial for the R package jomo used in the present simulation example please see: 
+# The present example uses the R package jomo.
+# For details on jomo and a tutorial please see: 
 # Quartagno, M., Grund, S., & Carpenter, J. (2019). 
 # jomo: A Flexible Package for Two-level Joint Modelling Multiple Imputation. R Journal.
 
@@ -62,9 +63,6 @@ summary(model1)
 # Intercept variable for imputation model
 Data$cons <- 1
 
-# Cluster variable
-clus           <- Data$subjectno
-
 
 # Outcome variable which will be imputed
 Y              <- as.data.frame(Data$mood)
@@ -74,22 +72,20 @@ X              <- as.data.frame(Data[, c("soc.connection", "time", "depressivity
 
 
 # Run jomo 
-imp <- jomo(Y = Y, X = X, clus = clus, nburn = 3000, nbetween = 1000, nimp = 20)
-## ##
-
+imp <- jomo(Y = Y, X = X, clus = Data$subjectno, nburn = 3000, nbetween = 1000, nimp = 20)
 
 
 # Analysing the imputed data
 imp.list <- imputationList(split(imp, imp$Imputation)[-1])
-fit.imp <- with(data = imp.list, lmer(mood ~ soc.connection + time + depressivity + (1 | subjectno), data = Data))
+fit.imp  <- with(data = imp.list, lmer(mood ~ soc.connection + time + depressivity + (1 | subjectno), data = Data))
 
 # Test estimates
 testEstimates(fit.imp, var.comp = TRUE)
 
 # Extract coefficients and variances
-coefs <- MIextract(fit.imp, fun = fixef)
-vars <- MIextract(fit.imp, fun = function(x) diag(vcov(x)))
+coefs    <- MIextract(fit.imp, fun = fixef)
+vars     <- MIextract(fit.imp, fun = function(x) diag(vcov(x)))
 
 # Pool results
-results <- MIcombine(coefs, vars)
+results  <- MIcombine(coefs, vars)
 summary(results)
